@@ -74,23 +74,6 @@ mvn spring-boot:run
 ---
 
 
-## 📦 Docker Deployment
-To deploy the bot with **Docker**, create a `Dockerfile`:
-
-```dockerfile
-FROM openjdk:17
-WORKDIR /app
-COPY target/otodom-price-bot.jar otodom-price-bot.jar
-ENTRYPOINT ["java", "-jar", "otodom-price-bot.jar"]
-```
-
-Then, build and run:
-```sh
-docker build -t otodom-price-bot .
-docker run --env-file .env -p 8080:8080 otodom-price-bot
-```
-
----
 
 
 
