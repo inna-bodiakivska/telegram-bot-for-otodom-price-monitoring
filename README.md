@@ -7,6 +7,7 @@
 ✅ Track real estate prices on Otodom.pl  
 ✅ Get a list of all tracked properties using `/all`  
 ✅ Automatic price monitoring and notifications  
+✅ Remove a tracked property using `/remove [URL]`  
 ✅ Secure data storage with **PostgreSQL**  
 ✅ Easy deployment with **Docker**  
 
@@ -16,13 +17,15 @@
 1️⃣ **Start the bot** → `/start`  
 2️⃣ **Send a property link** → Bot saves it for tracking  
 3️⃣ **Check your tracked properties** → `/all`  
-4️⃣ **Receive alerts** when a price changes  
+4️⃣ **Remove a property from tracking** → `/remove [URL]`  
+5️⃣ **Receive alerts** when a price changes  
 
 Example usage:  
 ```
 /start
 https://www.otodom.pl/pl/oferta/12345678
 /all
+/remove https://www.otodom.pl/pl/oferta/12345678
 ```
 
 ## 📥 Installation
@@ -65,7 +68,8 @@ mvn spring-boot:run
 |-----------|------------|
 | `/start`  | Start the bot |
 | `/all`    | Get a list of all tracked properties |
-| `[URL]`   | Send a property link to start tracking |
+| `[URL]`           | Send a property link to start tracking |
+| `/remove [URL]`   | Stop tracking the link |
 
 ---
 
