@@ -26,7 +26,7 @@ public class PriceParser {
             }
             LOG.debug("Failed to find the price for '{}'", url);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("An error occurred while parsing price: ", e);
         }
         return null;
     }

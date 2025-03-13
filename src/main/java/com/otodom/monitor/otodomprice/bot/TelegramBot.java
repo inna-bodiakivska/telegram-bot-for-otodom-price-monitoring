@@ -1,7 +1,7 @@
 package com.otodom.monitor.otodomprice.bot;
 
 import com.otodom.monitor.otodomprice.entity.Property;
-import com.otodom.monitor.otodomprice.service.PropertyService;
+import com.otodom.monitor.otodomprice.service.PropertyServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelegramBot.class);
 
-    private final PropertyService propertyService;
+    private final PropertyServiceImpl propertyService;
 
     @Value("${telegram.bot.token}")
     private String botToken;
@@ -27,7 +27,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${telegram.bot.username}")
     private String botUsername;
 
-    public TelegramBot(PropertyService propertyService) {
+    public TelegramBot(PropertyServiceImpl propertyService) {
         this.propertyService = propertyService;
     }
 
@@ -61,6 +61,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         } else if (text.startsWith("/all")) {
             LOG.info("Retrieving list of all monitored links for: '{}' ", chatId);
             sendAllTrackedLinks(chatId);
+        } else if (text.startsWith("/remove")) {
+            handleRemoveCommand(chatId, text);
         } else {
             LOG.info("In chat: '{}' incorrect text was added '{}' ", chatId, text);
             sendTextMessage(chatId, "Please provide the link to otodom.pl for price monitoring or /all for retrieving a list of currently monitored links.");
@@ -81,7 +83,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            LOG.error("An error occurred while sending a message: ", e);
         }
     }
 
@@ -98,5 +100,19 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         sendTextMessage(chatId, "List of monitored links:\n" + message);
     }
+
+    private void handleRemoveCommand(String chatId, String text) {
+        String[] parts = text.split(" ");
+        if (parts.length < 2) {
+            sendTextMessage(chatId, "Please use following format: /remove [URL]");
+            return;
+        }
+
+        String url = parts[1];
+        boolean removed = propertyService.removeProperty(url, Long.parseLong(chatId));
+        sendTextMessage(chatId, (removed ? "Successfully deleted: " : "Failed to remove: ") + url);
+
+    }
+
 }
 

@@ -14,20 +14,20 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @EnableScheduling
 public class OtodompriceApplication {
 
-	private static final Logger LOG = LoggerFactory.getLogger(OtodompriceApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OtodompriceApplication.class);
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		SpringApplication.run(OtodompriceApplication.class, args);
+        SpringApplication.run(OtodompriceApplication.class, args);
 
-	}
+    }
 
-	@Bean
-	public TelegramBotsApi telegramBotsApi(TelegramBot telegramBot) throws Exception {
-		TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-		botsApi.registerBot(telegramBot);
-		LOG.info("Telegram Bot Registered Successfully.");
-		return botsApi;
-	}
+    @Bean
+    public TelegramBotsApi telegramBotsApi(TelegramBot telegramBot) throws Exception {
+        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+        botsApi.registerBot(telegramBot);
+        LOG.info("Telegram Bot Registered Successfully.");
+        return botsApi;
+    }
 
 }
