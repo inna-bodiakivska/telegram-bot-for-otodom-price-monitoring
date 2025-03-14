@@ -36,16 +36,20 @@ cd otodom-price-bot
 ```
 
 ### 🔹 2. Configure the Bot
-Create a `.env` file or update `application.properties` with your bot credentials.
+Create a `.env` file or update `application.yml` with your bot credentials.
 
-```properties
-telegram.bot.token=YOUR_TELEGRAM_BOT_TOKEN
-telegram.bot.username=YOUR_BOT_USERNAME
+```yml
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/otodom
-spring.datasource.username=your_postgres_user
-spring.datasource.password=your_postgres_password
-spring.datasource.driver-class-name=org.postgresql.Driver
+  datasource:
+    url: jdbc:postgresql://localhost:5432/otodom
+    username: your_postgres_user
+    password: your_postgres_password
+    driver-class-name: org.postgresql.Driver
+
+telegram:
+  bot:
+    token: YOUR_TELEGRAM_BOT_TOKEN
+    username: YOUR_TELEGRAM_BOT_USERNAME
 
 ```
 
