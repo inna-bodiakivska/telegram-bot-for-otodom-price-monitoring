@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface PropertyService {
 
-    public void saveProperty(String url, Long chatId);
+    void saveProperty(String url, Long chatId);
 
-    public List<Property> getPropertiesByChatId(Long chatId);
+    List<Property> getPropertiesByChatId(Long chatId);
 
-    public boolean removeProperty(String url, Long chatId);
+    boolean removeProperty(String url, Long chatId);
 }

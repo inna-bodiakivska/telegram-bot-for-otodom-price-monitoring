@@ -14,6 +14,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.otodom.monitor.otodomprice.bot.Command.getCommand;
+
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
@@ -43,35 +45,50 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (!isTextAdded(update)) {
+        if (!isMessageAdded(update)) {
             return;
         }
 
         String chatId = update.getMessage().getChatId().toString();
         String text = update.getMessage().getText();
-        LOG.info("For chat: '{}' text is added '{}' ", chatId, text);
-
-        if (text.startsWith("/start")) {
-            LOG.info("Started chat: '{}' ", chatId);
-            sendTextMessage(chatId, "Hello! Please send me the link to Otodom.pl for price monitoring.");
-        } else if (text.startsWith("https://www.otodom.pl/")) {
-            LOG.info("In chat: '{}' otodom.pl link was added '{}' ", chatId, text);
-            propertyService.saveProperty(text, Long.parseLong(chatId));
-            sendTextMessage(chatId, "Your request was accepted. Started monitoring the price for you.");
-        } else if (text.startsWith("/all")) {
-            LOG.info("Retrieving list of all monitored links for: '{}' ", chatId);
-            sendAllTrackedLinks(chatId);
-        } else if (text.startsWith("/remove")) {
-            handleRemoveCommand(chatId, text);
-        } else {
-            LOG.info("In chat: '{}' incorrect text was added '{}' ", chatId, text);
-            sendTextMessage(chatId, "Please provide the link to otodom.pl for price monitoring or /all for retrieving a list of currently monitored links.");
+        LOG.info("For chat: '{}' message was added '{}' ", chatId, text);
+        Command command = getCommand(text);
+        switch (command) {
+            case START:
+                handelStart(chatId);
+                break;
+            case LINK:
+                handelAddingNewLinkForMonitoring(chatId, text);
+                break;
+            case ALL:
+                handelRetrievingAllMonitoredLinks(chatId);
+                break;
+            case REMOVE:
+                handleRemoveCommand(chatId, text);
+                break;
+            default:
+                handleIncorrectCommand(chatId, text);
+                break;
         }
-
-
     }
 
-    private static boolean isTextAdded(Update update) {
+    private void handelStart(String chatId) {
+        LOG.info("Started chat: '{}' ", chatId);
+        sendTextMessage(chatId, "Hello! Please send me the link to otodom.pl for price monitoring.");
+    }
+
+    private void handelAddingNewLinkForMonitoring(String chatId, String text) {
+        LOG.info("In chat: '{}' otodom.pl link was added '{}' ", chatId, text);
+        propertyService.saveProperty(text, Long.parseLong(chatId));
+        sendTextMessage(chatId, "Your request was accepted. Started monitoring the price for you.");
+    }
+
+    private void handleIncorrectCommand(String chatId, String text) {
+        LOG.info("In chat: '{}' incorrect text was added '{}' ", chatId, text);
+        sendTextMessage(chatId, "Please provide the link to otodom.pl for price monitoring or /all for retrieving a list of currently monitored links.");
+    }
+
+    private static boolean isMessageAdded(Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
@@ -87,7 +104,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendAllTrackedLinks(String chatId) {
+    private void handelRetrievingAllMonitoredLinks(String chatId) {
+        LOG.info("Retrieving list of all monitored links for: '{}' ", chatId);
         List<Property> properties = propertyService.getPropertiesByChatId(Long.parseLong(chatId));
         if (properties.isEmpty()) {
             sendTextMessage(chatId, "Currently you have no link for price monitoring");
@@ -110,7 +128,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String url = parts[1];
         boolean removed = propertyService.removeProperty(url, Long.parseLong(chatId));
-        sendTextMessage(chatId, (removed ? "Successfully deleted: " : "Failed to remove: ") + url);
+        sendTextMessage(chatId, (removed ? "Successfully removed: " : "Failed to remove: ") + url);
 
     }
 
