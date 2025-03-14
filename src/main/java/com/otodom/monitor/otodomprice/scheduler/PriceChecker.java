@@ -4,17 +4,16 @@ import com.otodom.monitor.otodomprice.bot.TelegramBot;
 import com.otodom.monitor.otodomprice.dao.PropertyRepository;
 import com.otodom.monitor.otodomprice.entity.Property;
 import com.otodom.monitor.otodomprice.parser.PriceParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class PriceChecker {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PriceChecker.class);
 
     private final PropertyRepository propertyRepository;
     private final PriceParser priceParser;
@@ -42,7 +41,7 @@ public class PriceChecker {
                 String message = "The price have changed! New price: " + newPrice + " PLN\n" + url;
                 String chatId = property.getChatId().toString();
                 telegramBot.sendTextMessage(chatId, message);
-                LOG.info("Notifying '{}' that price have changed to {} for {} ", chatId, newPrice, url);
+                log.info("Notifying '{}' that price have changed to {} for {} ", chatId, newPrice, url);
             }
         }
     }

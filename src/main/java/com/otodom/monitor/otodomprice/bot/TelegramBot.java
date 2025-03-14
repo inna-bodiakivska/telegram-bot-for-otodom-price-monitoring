@@ -1,9 +1,8 @@
 package com.otodom.monitor.otodomprice.bot;
 
 import com.otodom.monitor.otodomprice.entity.Property;
-import com.otodom.monitor.otodomprice.service.PropertyServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.otodom.monitor.otodomprice.service.PropertyService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -16,12 +15,11 @@ import java.util.stream.Collectors;
 
 import static com.otodom.monitor.otodomprice.bot.Command.getCommand;
 
+@Slf4j
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TelegramBot.class);
-
-    private final PropertyServiceImpl propertyService;
+    private final PropertyService propertyService;
 
     @Value("${telegram.bot.token}")
     private String botToken;
@@ -29,7 +27,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Value("${telegram.bot.username}")
     private String botUsername;
 
-    public TelegramBot(PropertyServiceImpl propertyService) {
+    public TelegramBot(PropertyService propertyService) {
         this.propertyService = propertyService;
     }
 
@@ -51,7 +49,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
         String chatId = update.getMessage().getChatId().toString();
         String text = update.getMessage().getText();
-        LOG.info("For chat: '{}' message was added '{}' ", chatId, text);
+        log.info("For chat: '{}' message was added '{}' ", chatId, text);
         Command command = getCommand(text);
         switch (command) {
             case START:
@@ -73,22 +71,22 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void handelStart(String chatId) {
-        LOG.info("Started chat: '{}' ", chatId);
+        log.info("Started chat: '{}' ", chatId);
         sendTextMessage(chatId, "Hello! Please send me the link to otodom.pl for price monitoring.");
     }
 
     private void handelAddingNewLinkForMonitoring(String chatId, String text) {
-        LOG.info("In chat: '{}' otodom.pl link was added '{}' ", chatId, text);
+        log.info("In chat: '{}' otodom.pl link was added '{}' ", chatId, text);
         propertyService.saveProperty(text, Long.parseLong(chatId));
         sendTextMessage(chatId, "Your request was accepted. Started monitoring the price for you.");
     }
 
     private void handleIncorrectCommand(String chatId, String text) {
-        LOG.info("In chat: '{}' incorrect text was added '{}' ", chatId, text);
+        log.info("In chat: '{}' incorrect text was added '{}' ", chatId, text);
         sendTextMessage(chatId, "Please provide the link to otodom.pl for price monitoring or /all for retrieving a list of currently monitored links.");
     }
 
-    private static boolean isMessageAdded(Update update) {
+    private boolean isMessageAdded(Update update) {
         return update.hasMessage() && update.getMessage().hasText();
     }
 
@@ -100,12 +98,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
-            LOG.error("An error occurred while sending a message: ", e);
+            log.error("An error occurred while sending a message: ", e);
         }
     }
 
     private void handelRetrievingAllMonitoredLinks(String chatId) {
-        LOG.info("Retrieving list of all monitored links for: '{}' ", chatId);
+        log.info("Retrieving list of all monitored links for: '{}' ", chatId);
         List<Property> properties = propertyService.getPropertiesByChatId(Long.parseLong(chatId));
         if (properties.isEmpty()) {
             sendTextMessage(chatId, "Currently you have no link for price monitoring");

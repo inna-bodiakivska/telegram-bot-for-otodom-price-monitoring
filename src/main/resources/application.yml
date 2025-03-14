@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: otodomprice
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/otodom
+    username: your_postgres_user
+    password: your_postgres_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+telegram:
+  bot:
+    token: your_bot_token_here
+    username: your_bot_name_here
